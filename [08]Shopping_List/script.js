@@ -81,7 +81,11 @@ function onClickItem(e){
 
 function setItemToEdit(item){
     isEditMode=true;
-    item.style.color='#ccc';
+    itemList.querySelectorAll('li').forEach((i)=>{
+        i.classList.remove('edit-mode');
+    })
+   
+    item.classList.add('edit-mode')
     const text=item.textContent;
     butn.innerHTML='<i class="fa-solid fa-pen"></i>Update Item';
     butn.style.backgroundColor='#228B22';
