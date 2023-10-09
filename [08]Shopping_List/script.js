@@ -15,14 +15,54 @@ function addItem(e){
         alert("Please Add and Item");
         return
     }
+
     const newItem=itemInput.value;
+
+    if(isEditMode){
+        
+        //get the item that we are editing
+        const items=itemList.querySelectorAll('li');
+        let itemEdited;
+        items.forEach(item => {
+            if(item.classList.contains('edit-mode')){
+                itemEdited=item;
+            }
+        });
+        console.log(`item to edit is`+itemEdited.textContent);
+        removeItemFromLocalStorage(itemEdited.textContent);
+        itemEdited.classList.remove('edit-mode');
+        itemEdited.remove();
+
+        isEditMode=false;
+    }
+    
+    if(checkIfItemExist(newItem)){
+        alert('Item Already exist');
+        checkUI();
+        return;
+    }
    
+    
+
+    
 
     addItemToDom(newItem);
     addItemToStorage(newItem);
     checkUI();
     itemInput.value='';
+
     
+}
+
+function checkDuplicate(newItem){
+    const items=getItemsfromStorage;
+
+    items.forEach(item=>{
+        if(item.toLowerCase()===newItem.toLowerCase()){
+            return 1;
+        }
+    })
+    return 0;
 }
 function getItemsfromStorage(){
     let itemFromLocalStorage;
@@ -77,6 +117,20 @@ function onClickItem(e){
     else{
        setItemToEdit(e.target);
     }
+}
+
+function checkIfItemExist(newItem){
+    const items=getItemsfromStorage();
+    let ans=false;
+    items.forEach(item=>{
+        console.log(item);
+        if(item.toLowerCase()===newItem.toLowerCase()){
+            console.log('item exist');
+            ans= true;
+            
+        }
+    })
+    return ans;
 }
 
 function setItemToEdit(item){
@@ -148,6 +202,7 @@ function filterItem(e){
 }
 
 function checkUI(){
+    itemInput.value='';
     const items=itemList.querySelectorAll('li');
     // console.log(items);
     if(items.length===0){
@@ -157,6 +212,9 @@ function checkUI(){
         clearAll.style.display='block';
         itemfilter.style.display='block';
     }
+    butn.innerHTML='<i class="fa-solid fa-plus"></i> Add Item';
+    butn.style.backgroundColor='#333';
+    isEditMode=false;
 }
 
 function displayItemsFromStorage(){
