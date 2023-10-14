@@ -1,0 +1,13 @@
+body{
+    background-color: white;
+}
+
+
+
+#result{
+    list-style-type: none;
+    display: flex;
+    max-width: 600px;
+    justify-content: space-around;
+    align-items: center;
+}
