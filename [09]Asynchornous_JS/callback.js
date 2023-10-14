@@ -18,10 +18,21 @@ function getPost(){
 
 
 function creatPost(name){
-    setTimeout(function(){
-        arr.push({'name':name,'title':'rmase'});
-        getPost();
-    },2000);
+    return new Promise((resolve,reject)=>{
+        setTimeout(function(){
+            let error=true;
+
+            if(!error){
+                arr.push({'name':name,'title':'rmase'});
+                resolve();
+            }else{
+                reject('Something went wrong');
+            }
+        },2000)
+    });
+        
+    
+    
 }
 
-creatPost('harsh')
+creatPost('harsh').then(getPost).catch((err)=>console.log(err));
