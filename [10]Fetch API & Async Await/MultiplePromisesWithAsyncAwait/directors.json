@@ -1,0 +1,20 @@
+{
+    "directors": [
+      {
+        "name": "Christopher Nolan",
+        "age": 52,
+        "movies": ["Inception", "The Dark Knight", "Interstellar"]
+      },
+      {
+        "name": "Steven Spielberg",
+        "age": 75,
+        "movies": ["Jurassic Park", "Schindler's List", "Saving Private Ryan"]
+      },
+      {
+        "name": "Quentin Tarantino",
+        "age": 59,
+        "movies": ["Pulp Fiction", "Django Unchained", "Kill Bill"]
+      }
+    ]
+  }
+  

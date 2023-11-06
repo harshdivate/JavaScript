@@ -1,0 +1,20 @@
+{
+    "actors": [
+      {
+        "name": "Tom Hanks",
+        "age": 65,
+        "movies": ["Forrest Gump", "Cast Away", "Saving Private Ryan"]
+      },
+      {
+        "name": "Meryl Streep",
+        "age": 72,
+        "movies": ["The Devil Wears Prada", "Sophie's Choice", "The Iron Lady"]
+      },
+      {
+        "name": "Leonardo DiCaprio",
+        "age": 47,
+        "movies": ["Titanic", "Inception", "The Revenant"]
+      }
+    ]
+  }
+  
