@@ -16,6 +16,7 @@ function addToDom(data){
     data.forEach(element => {
         const div=document.createElement('div');
         div.textContent=element.title;
+        console.log(element.completed);
         if(element.completed){
             div.classList+="done";
         }
@@ -32,14 +33,15 @@ function addElement(e){
     if(item===''){
         alert("Enter a value");
     }else{
+
         fetch(api,{
             method:"POST",
             body:{
-                title:"Harsh Divate",
+                title:item,
                 completed:false,
             }
         });
-        addToDom([{title:"harsh ",completed:false}])
+        addToDom([{item,completed}])
         console.log('Post Done');
     }
     console.log(item);
