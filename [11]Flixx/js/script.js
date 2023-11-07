@@ -75,6 +75,9 @@ async function displayMovieDetails(){
   const id=parseInt(movieid.split('=')[1]);
   const result =await fetchAPIData(`movie/${id}`);
   const movieDetails=document.querySelector('#movie-details');
+
+  //Overlay for background image
+  displayBackgroundImage('movie',result.backdrop_path);
   console.log(result);
   const div=document.createElement('div');
   div.classList.add('details-top');
@@ -137,55 +140,101 @@ async function displayMovieDetails(){
 }
 
 
+async function displayShowDetails(){
+  const showid = window.location.search;
+  const id = parseInt(showid.split('=')[1]);
+  const show = await fetchAPIData(`tv/${id}`);
+  const div = document.querySelector('#show-details');
+  displayBackgroundImage('show',show.backdrop_path);
+  console.log(show.backdrop_path);
+  div.innerHTML=`      
+  <div class="details-top">
+  <div>
+    ${
+      show.poster_path ? `
+      <img
+      src="https://image.tmdb.org/t/p/w500${show.poster_path}";
+      class="card-img-top"
+      alt="${show.original_name}"
+    />` : `<img
+    src="../images/no-image.jpg"
+    class="card-img-top"
+    alt="${show.original_name}"
+      />`
+    }
+  </div>
+  <div>
+    <h2>${show.original_name}</h2>
+    <p>
+      <i class="fas fa-star text-primary"></i>
+      ${show.vote_average.toFixed(1)}/ 10
+    </p>
+    <p class="text-muted">Release Date: ${show.first_air_date}</p>
+    <p>
+     ${show.overview}
+    </p>
+    <h5>Genres</h5>
+    <ul class="list-group">
+     ${
+        show.genres.map((g)=>`<li>${g.name}</li>`).join('')
+     }
+    </ul>
+    <a href="${show.homepage}" target="_blank" class="btn">Visit Show Homepage</a>
+  </div>
+</div>
+<div class="details-bottom">
+  <h2>Show Info</h2>
+  <ul>
+    <li><span class="text-secondary">Number Of Episodes:</span> ${show.number_of_episodes}</li>
+    <li>
+      <span class="text-secondary">Last Episode To Air:</span> ${show.last_air_date}
+    
+    </li>
+    <li><span class="text-secondary">Status:</span> ${show.status}</li>
+  </ul>
+  <h4>Production Companies</h4>
+  <div class="list-group">
+      ${
+        show.production_companies.map(p=>`<li>${p.name}</li>`).join('')
+      }
+  </div>
+</div>`
+ 
+
+console.log(show);
+}
+
+
+//Display Backdrop  on Details Page
+function displayBackgroundImage(type,background_path){
+  const overlayDiv = document.createElement('div');
+  overlayDiv.style.backgroundImage=`url(https://image.tmdb.org/t/p/original/${background_path})`;
+  overlayDiv.style.backgroundRepeat='no-repeat';
+  overlayDiv.style.backgroundPosition='center';
+  overlayDiv.style.backgroundSize='cover';
+  overlayDiv.style.height='100vh';
+  overlayDiv.style.width='100vw';
+  overlayDiv.style.position='absolute';
+  overlayDiv.style.top='0';
+  overlayDiv.style.left='0';
+  overlayDiv.style.zIndex='-1';
+  overlayDiv.style.opacity='0.1';
+  
+  if(type==='movie'){
+    document.querySelector('#movie-details').appendChild(overlayDiv);
+  }else if(type==='show'){
+    console.log('her');
+    document.querySelector('#show-details').appendChild(overlayDiv);
+
+  }
+}
+
 function addCommasToNumber(number){
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 }
 
-{/* <div class="details-top">
-          <div>
-            <img
-              src="images/no-image.jpg"
-              class="card-img-top"
-              alt="Movie Title"
-            />
-          </div>
-          <div>
-            <h2>Movie Title</h2>
-            <p>
-              <i class="fas fa-star text-primary"></i>
-              8 / 10
-            </p>
-            <p class="text-muted">Release Date: XX/XX/XXXX</p>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Maiores
-              atque molestiae error debitis provident dolore hic odit, impedit
-              sint, voluptatum consectetur assumenda expedita perferendis
-              obcaecati veritatis voluptatibus. Voluptatum repellat suscipit,
-              quae molestiae cupiditate modi libero dolorem commodi obcaecati!
-              Ratione quia corporis recusandae delectus perspiciatis consequatur
-              ipsam. Cumque omnis ad recusandae.
-            </p>
-            <h5>Genres</h5>
-            <ul class="list-group">
-              <li>Genre 1</li>
-              <li>Genre 2</li>
-              <li>Genre 3</li>
-            </ul>
-            <a href="#" target="_blank" class="btn">Visit Movie Homepage</a>
-          </div>
-        </div>
-        <div class="details-bottom">
-          <h2>Movie Info</h2>
-          <ul>
-            <li><span class="text-secondary">Budget:</span> $1,000,000</li>
-            <li><span class="text-secondary">Revenue:</span> $2,000,000</li>
-            <li><span class="text-secondary">Runtime:</span> 90 minutes</li>
-            <li><span class="text-secondary">Status:</span> Released</li>
-          </ul>
-          <h4>Production Companies</h4>
-          <div class="list-group">Company 1, Company 2, Company 3</div>
-        </div> */}
+
 
 
 async function fetchAPIData(endpoint){
@@ -222,7 +271,6 @@ function init(){
     switch(global.currentPage){
         case '/' :
         case 'index.html':
-
             displayPopularMovies();
             break;
         case '/shows.html':
@@ -236,7 +284,7 @@ function init(){
             break;
 
         case '/tv-details.html':
-            console.log('TV Details');
+            displayShowDetails();
             break;
         
         case '/search.html':
