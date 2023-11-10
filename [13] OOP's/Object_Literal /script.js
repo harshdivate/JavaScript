@@ -1,24 +1,23 @@
-const rectanglePrototypes = {
-    area: function (){
-        return this.width* this.height
-    },
-    perimeter : function (){
-        return 2*(this.height+this.width)
-    },
-    isSquare : function(){
-        return this.height===this.width;
-    }
+function Shape(name){
+    this.name = name;
+}
+Shape.prototype.logName =  function (){
+    console.log(`Shape name :${this.name}`);
 }
 
-function createRectangle(height,width){
-    return Object.create(rectanglePrototypes,{
-        height :{
-            value : height
-        },
-        width :{
-            value: width
-        }
-    })
+function Rectangle(name,height,width){
+    this.width=width;
+    this.height=height;
+    Shape.call(this,name)
 }
-const rect = createRectangle(10,20);
-console.log(rect);
+// Inherits Shape Prototype 
+Rectangle.prototype = Object.create(Shape.prototype)
+function Circle(name,radius){
+    this.radius=radius;
+    Shape.call(this,name)
+}
+
+const rect = new Rectangle('Rect1',10,20);
+const c = new Circle('Circle1',20)
+console.log(rect,c);
+rect.logName();
