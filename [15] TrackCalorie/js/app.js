@@ -1,6 +1,6 @@
 class CaloriTracker {
     constructor(){
-        this._calorielimit = 5000 ;
+        this._calorielimit = Storage.getCalorieLimit() ;
         this._totalCalories = 0;
         this._meals = [];
         this._workouts = [];
@@ -25,6 +25,43 @@ class CaloriTracker {
         this._workouts.push(workout);
         this._totalCalories -= workout.calorie;
         this._displayNewWorkout(workout);
+        this._render();
+    }
+
+    removeMeal(id){
+        const index = this._meals.findIndex((meal)=> meal.id === id );
+
+        if(index !== -1){
+            const meal = this._meals[index];
+            this._totalCalories -= meal.calorie;
+            this._meals.splice(index,1);
+            this._render();
+        }
+    }
+
+    removeWorkout(id){
+        const index = this._workouts.findIndex((w)=> w.id === id );
+
+        if(index !== -1){
+            const workout = this._workouts[index];
+            this._totalCalories += workout.calorie;
+            this._workouts.splice(index,1);
+            this._render();
+        }
+    }
+
+    resetDay(){
+        this._totalCalories = 0;
+        this._meals = [];
+        this._workouts = [];
+        this._render();
+    }
+
+    setLimit(limit){
+        
+        this._calorielimit = limit;
+        Storage.setCalorieLimit(limit);
+        this._displayCaloriesLimit();
         this._render();
     }
 
@@ -83,7 +120,10 @@ class CaloriTracker {
 
     _displayNewMeal(meal){
         const mealDiv = document.getElementById('meal-items');
-        mealDiv.innerHTML =` <div class="card my-2">
+        const div = document.createElement('div');
+        div.classList.add('card','my-2','meal');
+        div.setAttribute('data-id',meal.id);
+        div.innerHTML =` 
         <div class="card-body">
           <div class="d-flex align-items-center justify-content-between">
             <h4 class="mx-1">${meal.name}</h4>
@@ -96,13 +136,16 @@ class CaloriTracker {
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
-        </div>
-      </div>`;
+        </div>`;
+        mealDiv.appendChild(div);
     }
 
     _displayNewWorkout(workout){
         const workoutDiv = document.getElementById('workout-items');
-        workoutDiv.innerHTML = ` <div class="card my-2">
+        const div = document.createElement('div');
+        div.classList.add('card','my-2','workout');
+        div.setAttribute('data-id',workout.id);
+        div.innerHTML = ` 
         <div class="card-body">
           <div class="d-flex align-items-center justify-content-between">
             <h4 class="mx-1">${workout.name}</h4>
@@ -115,8 +158,8 @@ class CaloriTracker {
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
-        </div>
-      </div>`
+        </div>`;
+        workoutDiv.appendChild(div);
     }
 
     _render(){
@@ -145,11 +188,54 @@ class Workout {
     }
 }
 
+class Storage {
+    static getCalorieLimit (defaultLimit = 2000){
+        let calorieLimit;
+        if(localStorage.getItem('calorieLimit')===null){
+            calorieLimit = defaultLimit;
+        }else{
+            calorieLimit = +localStorage.getItem('calorieLimit');
+        }
+        return calorieLimit;
+    }
+
+    static setCalorieLimit ( calorieLimit){
+        localStorage.setItem('calorieLimit',calorieLimit); 
+    }
+}
+
 class App {
     constructor() {
         this._tracker = new CaloriTracker();
         document.getElementById('meal-form').addEventListener('submit',this._newMeal.bind(this));
         document.getElementById('workout-form').addEventListener('submit',this._newWorkout.bind(this));
+        document.getElementById('meal-items').addEventListener('click',this._removeItem.bind(this,'meal'))
+        document.getElementById('workout-items').addEventListener('click',this._removeItem.bind(this,'workout'))
+        document.getElementById('filter-meals').addEventListener('input',this._filterItem.bind(this,'meal'));
+        document.getElementById('filter-workouts').addEventListener('input',this._filterItem.bind(this,'workout'));
+        document.getElementById('reset').addEventListener('click',this._reset.bind(this));
+        document.getElementById('limit-form').addEventListener('submit',this._setLimit.bind(this));
+    }
+
+
+    _setLimit(e){
+        e.preventDefault();
+        const limit = document.getElementById('limit').value;
+        this._tracker.setLimit(+limit);
+    }
+
+
+    _filterItem(type,e){
+        const filterItem =document.getElementById(`filter-${type}s`).value;
+        const data = document.querySelectorAll(`.${type}`);
+        data.forEach((d)=>{
+            const mealItem= d.firstElementChild.firstElementChild.firstElementChild.textContent.toLowerCase();
+            if(mealItem.includes(filterItem)){
+                d.style.display = 'block';
+            }else{
+                d.style.display= 'none';
+            }
+        })
 
     }
 
@@ -193,6 +279,35 @@ class App {
             toggle:true
         })
     }
+
+    _removeItem(type,e){
+        if(e.target.classList.contains('fa-xmark') || e.target.classList.contains('delete')){
+            if(confirm('Are you sure?')){
+                const id = e.target.closest('.card').getAttribute('data-id');
+                console.log(id);
+
+                type === 'meal' ? this._tracker.removeMeal(id) : this._tracker.removeWorkout(id);
+
+                const item = e.target.closest('.card');
+                item.remove();
+
+            }
+        }
+    }
+
+    _reset(e){
+       this._tracker.resetDay();
+       document.querySelectorAll('.meal').forEach((d)=>{
+        
+        d.remove();
+       }) 
+       document.querySelectorAll('.workout').forEach(d=>{
+        d.remove();
+       })
+    }
+
 }
+
+
 
 const app = new App();
